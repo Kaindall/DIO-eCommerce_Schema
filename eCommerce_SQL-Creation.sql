@@ -18,45 +18,46 @@ CREATE TABLE IF NOT EXISTS client (
 
 CREATE TABLE IF NOT EXISTS product (
 	idProduct INT AUTO_INCREMENT PRIMARY KEY,
+    Pname VARCHAR(45),
     category ENUM("Toy", "Mechanic", "Domestic", "Eletronic", "Clothing", "Food"),
-    valor FLOAT,
-    underage BOOL DEFAULT false,
+    price FLOAT NOT NULL,
+    underage BOOLEAN DEFAULT false,
     rating FLOAT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS payment (
-	idClient INT,
-    idPayment INT,
+	idPayment INT AUTO_INCREMENT,
+    idClient INT,
     paymentType ENUM ("QR Code", "Pix", "Credit Card", "Debit Card", "Two Cards"),
     verification_code VARCHAR(20),
     validity DATE,
     value_limit FLOAT,
     useful BOOL DEFAULT false,
-    PRIMARY KEY (idClient, idPayment),
+    PRIMARY KEY (idPayment, idClient),
     CONSTRAINT fk_payment_client FOREIGN KEY (idClient) REFERENCES client (idClient) ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS request (
-	idOrder INT,
+	idOrder INT AUTO_INCREMENT,
     idClient INT,
     idPayment INT,
     statement ENUM ("Waiting Payment", "Paid", "Travelling", "Finished", "Canceled") DEFAULT "Waiting Payment",
     details VARCHAR (255),
     price FLOAT NOT NULL,
     PRIMARY KEY (idOrder, idClient),
-    CONSTRAINT fk_orders_payment FOREIGN KEY (idClient, idPayment) REFERENCES payment(idClient, idPayment) ON UPDATE CASCADE
+    CONSTRAINT fk_orders_payment FOREIGN KEY (idPayment, idClient) REFERENCES payment(idPayment, idClient) ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS delivery (
-	idDelivery INT,
-    idRequest INT,
+	idDelivery INT AUTO_INCREMENT,
+    idOrder INT,
 	delivery_cost FLOAT DEFAULT 0,
     delivery_status ENUM ("Waiting Confirmation", "Unpacking", "Detaching", "Sending to the Carrying", "In Travel", "Delivered") 
     DEFAULT "Waiting Confirmation",
     sender_adress VARCHAR (255),
     final_adress VARCHAR (255),
-    PRIMARY KEY (idRequest, idDelivery),
-    CONSTRAINT fk_delivery_order FOREIGN KEY (idRequest) REFERENCES request(idOrder) ON UPDATE CASCADE
+    PRIMARY KEY (idDelivery, idOrder),
+    CONSTRAINT fk_delivery_order FOREIGN KEY (idOrder) REFERENCES request(idOrder) ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS warehouse (
